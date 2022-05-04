@@ -1,0 +1,331 @@
+---
+title: "STATS 401 - Final Project"
+author: "Ben Abraham"
+date: "March 20th, 2022"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    theme: cosmo
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(car)
+```
+
+## Cancer Mortality Rates Dataset
+> This dataset contains data pertaining to Cancer Mortality Rates from a random sample of 570 counties throughout the United States, and contains the variables listed below:
+
+* cmRate: The number of cancer mortalities per 100 thousand people
+* population: The population of the county
+* medianIncome: The median income of the county
+* binnedIncome: The median income of the county binned by decile
+* pctPoverty: The percent of the county living in poverty
+* avgHouse: The average household size in terms of the number of residents
+* medianAge: The median age of county residents
+* medianAgeM: The median age of male county residents
+* medianAgeF: The median age of female county residents
+* pctHS: The percent of county residents (ages 25+) with a high school diploma
+* pctBach: The percent of county residents (ages 25+) with a bachelor's degree
+* pctEmployed: The percent of county residents (ages 16+) who are employed
+* pctUnemployed: The percent of county residents (ages 16+) who are unemployed
+* pctPrivateHC: The percent of county residents with private health coverage
+* pctEmployerHC: The percent of county residents with employer-provided health coverage
+* pctPublicHC: The percent of county residents with government-provided health coverage
+* pctWhite: The percent of county residents who identify as White
+* pctBlack: The percent of county residents who identify as Black
+* pctAsian: The percent of county residents who identify as Asian
+* pctOther: The percent of county residents who identify as a race which is not White, Black, or Asian
+* pctMarried: The percent of county residents who are married
+* pctMarriedHouse: The percent of married households
+* birthRate: The number of live births relative to number of women in county
+* region: The region of the county
+* state: The state of the county
+* county: The name of the county
+
+```{r dataset}
+rates <- read.csv("cancer_mortality_rates.csv", stringsAsFactors = TRUE)
+rates$medianIncome <- rates$medianIncome / 1000
+```
+
+
+```{r}
+head(rates)
+```
+## Initial Model and Data Exploration
+
+### Variables
+- **Response:** Median Income
+- **Quantitative Predictor #1:** Percent of Residents with Bachelor's Degree
+- **Quantitative Predictor #2:** Unemployment Rate
+- **Quantitative Predictor #3:** Average Household Size
+- **Categorical Predictor:** Region
+
+```{r numericalSummaries}
+# Replace this text with your code
+summary(rates)
+```
+
+```{r histograms}
+# Replace this text with your code
+hist(rates$medianIncome,
+     main = "Histogram of Median Income (in thousands of dollars)",
+     xlab = "Median Income",
+     col = "deepskyblue")
+hist(rates$pctBach,
+     main = "Histogram of Proportions of Residents with Bachelors Degree",
+     xlab = "Proportions of Residents with Bachelors Degree",
+     col = "darkslategray3")
+hist(rates$pctUnemployed,
+     main = "Histogram of Unemployment Percent",
+     xlab = "Percent of County Residents (Ages 16+) who are Unemployed",
+     col = "darkseagreen2")
+hist(rates$avgHouse,
+     main = "Histogram of Average Household Size",
+     xlab = "Average Household Size",
+     col = "indianred2")
+```
+
+```{r scatterplotMatrix}
+# Replace this text with your code
+plot( ~ medianIncome + pctBach + pctUnemployed + avgHouse, data = rates)
+```
+```{r sideBySideBoxplot}
+# Replace this text with your code
+plot(medianIncome ~ region, data = rates, 
+     xlab = "Region", ylab = "Median Income (In thousands of dollars)", 
+     main = "Median Income by Region", 
+     col = c("darkkhaki", "dodgerblue", "darkorange3", "firebrick4", "lightblue1"))
+        
+```
+```{r intitialModel}
+# Replace this text with your code
+model <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + region, data = rates)
+summary(model)
+```
+
+
+
+
+### Scatterplots
+
+```{r}
+plot(rates[, c(3, 1, 2, 5, 6)])
+```
+```{r}
+plot(medianIncome ~ log(population),
+     data = rates,
+     col = c("blue", "orange", "gray40", "red", "lightblue")[region],
+     pch = c(1, 2, 3, 4, 5)[region],
+     xlab = "log(population)",
+     ylab = "Median Income",
+     main = "Median Income vs log(population) by Region")
+
+legend(x = 14.5, y = 99,
+       legend = levels(rates$region),
+       col = c("blue", "orange", "gray40", "red", "lightblue"),
+       pch = c(1, 2, 3, 4, 5))
+```
+
+
+```{r}
+plot(rates[, c(3, 7, 8, 9)])
+```
+
+
+```{r}
+plot(rates[, c(3, 10, 11, 12, 13)])
+```
+```{r}
+plot(rates[, c(3, 14, 15, 16)])
+```
+
+
+```{r}
+plot(rates[, c(3, 17, 18, 19, 20)])
+```
+
+```{r}
+plot(rates[, c(3, 21, 22, 23)])
+```
+
+## Final Model Development
+
+### Individual Models
+
+```{r}
+summary(model)
+model_version2 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctHS + region, data = rates)
+summary(model_version2)
+```
+
+
+
+```{r}
+summary(model)
+model_version3 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctEmployed + region, data = rates)
+summary(model_version3)
+```
+
+
+```{r}
+summary(model)
+model_version4 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctEmployerHC + region, data = rates)
+model_version5 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctPublicHC + region, data = rates)
+model_version6 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctPrivateHC + region, data = rates)
+summary(model_version4)
+summary(model_version5)
+summary(model_version6)
+```
+
+
+
+
+```{r}
+summary(model)
+model_version7 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctMarried + region, data = rates)
+summary(model_version7)
+```
+
+
+```{r}
+summary(model)
+model_version8 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctMarriedHouse + region, data = rates)
+summary(model_version8)
+```
+
+
+
+```{r}
+summary(model)
+model_version9 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctPoverty + region, data = rates)
+summary(model_version9)
+model_version10 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctPoverty + I(pctPoverty^2) + region, data = rates)
+summary(model_version10)
+```
+```{r}
+summary(model)
+model_version11 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + log(population) + region, data = rates)
+summary(model_version11)
+```
+
+
+### Combined Models
+
+```{r}
+summary(model)
+model_version12 <- lm(medianIncome ~ pctBach + pctUnemployed + pctPublicHC + pctPrivateHC + pctEmployerHC + pctMarried + pctMarriedHouse + avgHouse + pctPoverty + I(pctPoverty^2) + log(population) + region, data = rates)
+summary(model_version12)
+
+```
+
+```{r}
+plot(model_version12$fitted.values, model_version12$residuals,
+     main = "Residuals versus Fitted Values Plot",
+     xlab = "Fitted Values",
+     ylab = "Residuals")
+abline(h = 0, col = "red", lty = 2)
+qqnorm(model_version12$residuals, main = "QQ Plot of the Residuals")
+qqline(model_version12$residuals)
+```
+
+```{r}
+model_version13 <- lm(log(medianIncome) ~ pctBach + pctUnemployed + pctPublicHC + pctPrivateHC + pctEmployerHC + pctMarried + pctMarriedHouse + avgHouse + pctPoverty + log(population) + region, data = rates)
+summary(model_version12)
+summary(model_version13)
+```
+
+```{r}
+plot(model_version13$fitted.values, model_version13$residuals,
+     main = "Residuals versus Fitted Values Plot",
+     xlab = "Fitted Values",
+     ylab = "Residuals")
+abline(h = 0, col = "red", lty = 2)
+```
+
+
+
+```{r}
+summary(model_version12)
+model_version14 <- lm(medianIncome ~ pctBach + pctUnemployed + pctPublicHC + pctPrivateHC + pctEmployerHC + pctMarried + pctMarriedHouse + avgHouse + pctPoverty + I(pctPoverty^2) + I(pctPoverty^3) + log(population) + region, data = rates)
+summary(model_version14)
+plot(model_version14$fitted.values, model_version14$residuals,
+     main = "Residuals versus Fitted Values Plot",
+     xlab = "Fitted Values",
+     ylab = "Residuals")
+abline(h = 0, col = "red", lty = 2)
+
+sd(rates$pctBach) * model_version14$coefficients[2]
+sd(rates$pctUnemployed) * model_version14$coefficients[3]
+sd(rates$pctPublicHC) * model_version14$coefficients[4]
+sd(rates$pctPrivateHC) * model_version14$coefficients[5]
+sd(rates$pctEmployerHC) * model_version14$coefficients[6]
+sd(rates$pctMarried) * model_version14$coefficiends[7]
+sd(rates$pctMarriedHouse) * model_version14$coefficients[8]
+sd(rates$avgHouse) * model_version14$coefficients[9]
+sd(log(rates$population)) * model_version14$coefficients[13]
+
+```
+
+
+
+
+```{r}
+quadData <- data.frame(pctPoverty = seq(min(rates$pctPoverty), max(rates$pctPoverty), by = 0.01))
+quadData$pctBach <- mean(rates$pctBach)
+quadData$pctUnemployed <- mean(rates$pctUnemployed)
+quadData$pctPublicHC <- mean(rates$pctPublicHC)
+quadData$pctPrivateHC <- mean(rates$pctPrivateHC)
+quadData$pctEmployerHC <- mean(rates$pctEmployerHC)
+quadData$pctMarried <- mean(rates$pctMarried)
+quadData$pctMarriedHouse <- mean(rates$pctMarriedHouse)
+quadData$avgHouse <- mean(rates$avgHouse)
+quadData$population <- median(rates$population)
+quadData$region <- "Southeast"
+quadData$Fitted <- predict(model_version12, newdata = quadData)
+quadData$Fitted1 <- predict(model_version13, newdata = quadData)
+quadData$Fitted2 <- predict(model_version14, newdata = quadData)
+
+plot(rates$medianIncome ~ rates$pctPoverty)
+lines(quadData$pctPoverty, quadData$Fitted, col = "blue")
+lines(quadData$pctPoverty, quadData$Fitted1, col = "red")
+lines(quadData$pctPoverty, quadData$Fitted2, col = "green")
+```
+
+
+```{r}
+model_version15 <- lm(medianIncome ~ pctBach + pctUnemployed + pctPublicHC + pctPrivateHC + pctEmployerHC + pctMarriedHouse + avgHouse + pctPoverty + I(pctPoverty^2) + log(population) + region, data = rates)
+summary(model_version12)
+summary(model_version15)
+```
+
+```{r}
+vif(model_version15)
+```
+
+
+```{r}
+summary(rates)
+summary(model_version15)
+```
+
+
+
+
+
+```{r}
+sd(rates$pctBach) * model_version15$coefficients[2]
+sd(rates$pctUnemployed) * model_version15$coefficients[3]
+sd(rates$pctPublicHC) * model_version15$coefficients[4]
+sd(rates$pctPrivateHC) * model_version15$coefficients[5]
+sd(rates$pctEmployerHC) * model_version15$coefficients[6]
+sd(rates$pctMarriedHouse) * model_version15$coefficients[7]
+sd(rates$avgHouse) * model_version15$coefficients[8]
+sd(log(rates$population)) * model_version15$coefficients[11]
+
+```
+
+
+

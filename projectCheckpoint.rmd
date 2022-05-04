@@ -1,0 +1,202 @@
+---
+title: "Project Checkpoint"
+author: "Ben Abraham"
+date: "March 20th, 2022"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_collapsed: true
+    theme: lumen
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## Project Checkpoint
+
+This project checkpoint is designed for you to begin your data exploration process. Before creating a multiple linear regression model, you should always familiarize yourself with the data set and its individual variables. In this checkpoint, you will create numerical summaries and visualizations that should help guide your modeling process -- which predictors might help explain the response, which variables might need a transformation, which variables might benefit from an interaction, etc. 
+
+Most of your data sets have *several* predictors to choose from. In this assignment, I only ask that you analyze a few of them, but **please do not limit yourself to only these variables** throughout your final project. Creating your regression model should be an iterative process that uses different analysis techniques to create the best fitting model.  
+
+You all selected a few *potential* explanatory variables of interest in your project proposal. **These do not have to be the variables used here.** You may find that they're not as helpful in explaining the response as you thought. You are welcome (and encouraged!) to change, adjust, and [pivot](https://www.youtube.com/watch?v=8w3wmQAMoxQ), as needed. 
+
+And if you have any questions throughout the process, please ask us! The instructional team is here to help!
+
+
+
+### Creating an RStudio Project
+
+Now is a great time to create a dedicated RStudio Project (like you did in Lab 6) for all of your project documents. To do this, please follow these steps:
+
+1. Open up a *new* session of RStudio
+2. Navigate to File > New Project
+3. Click on New Directory
+4. Click on New Project
+5. Give your project a "Directory name" (something like "stats401project")
+6. Decide where you would like the project stored (I keep mine - and all other Stats 401 assignments - in a folder on my computer called stats401)
+7. Click "Create Project" 
+8. Move this "projectCheckpoint.Rmd" document to the project folder
+9. Move your data set to the project folder 
+
+
+
+### Read Data (2 points)
+
+Once you have created your RStudio Project and moved your data set into the folder, you will then be able to read in your data. To do this, you will use the `read.csv()` function and store it for use throughout the file.
+
+Reach out to us if you need help reading in your data! 
+
+```{r readData}
+# Replace this text with your code
+rates <- read.csv("cancer_mortality_rates.csv", stringsAsFactors = TRUE)
+```
+
+Once you have successfully loaded your data, complete the tasks below to complete the project checkpoint. *Failure to properly follow the instructions will result in point deductions.*
+
+
+
+### Variables (4 points)
+
+Fill in the following bullets with the variables you will be analyzing below. I recommend starting with the variables you described in your project proposal, but these can change throughout your modeling process. *There is no specific number of variables that your final model has to contain.* 
+
+- **Response:** Cancer Mortality Rate
+- **Quantitative Predictor #1:** Median Age
+- **Quantitative Predictor #2:** Unemployment Percent
+- **Quantitative Predictor #3:** Percent of Residents with Government-Provided Health Coverage
+- **Categorical Predictor:** Region
+
+
+
+### Numerical Summaries (4 points)
+
+For your quantitative variables (one response + three predictors), calculate the numerical summaries (five number summary + mean) using the `summary()` function.
+
+```{r numericalSummaries}
+# Replace this text with your code
+summary(rates$cmRate)
+summary(rates$medianAge)
+summary(rates$pctUnemployed)
+summary(rates$pctPublicHC)
+```
+
+What is the mean of your *response* variable? What is the range of your *response* variable? This is the variability that you will try to explain with your model!
+
+**Answer:** The mean of my response variable (Number of Cancer Mortalities per 100,000 people) is equal to 179. Addionally, the range of the response variable is $293.9 - 94.4 = 199.5$.
+
+
+
+### Histograms (10 points)
+
+Create a histogram for each of your quantitative variables (one response + three predictors). *Be sure to give each plot appropriate axis labels and a title.* 
+
+```{r histograms}
+# Replace this text with your code
+hist(rates$cmRate,
+     main = "Histogram of Cancer Mortality Rates",
+     xlab = "Number of Cancer Mortalities per 100000 people",
+     col = "deepskyblue")
+hist(rates$medianAge,
+     main = "Histogram of Median Age",
+     xlab = "Median Age",
+     col = "darkslategray3")
+hist(rates$pctUnemployed,
+     main = "Histogram of Unemployment Percent",
+     xlab = "Percent of County Residents (Ages 16+) who are Unemployed",
+     col = "darkseagreen2")
+hist(rates$pctPublicHC,
+     main = "Histogram of Percent on Government Healthcare",
+     xlab = "Percent of County Residents with Government-Provided Health Coverage",
+     col = "indianred2")
+```
+
+Reflect on your histograms by answering the question below. 
+
+- Would any of these quantitative variables benefit from a log transformation? Remember, we are looking for a *heavy* right skew - not just a slight right skew. 
+
+**Answer:** None of the quantitative variables have such a heavy right skew for which a log transformation would be required. The unemployment percent variable appears to be skewed right, but not so much as to require a log transformation.
+
+
+If you believe any of the variables might benefit from a log transformation, create a histogram(s) of the log-transformed variable(s) below. 
+
+```{r histogramsTransformed}
+# Replace this text with your code
+```
+
+Did the transformations help? (No need to type up an answer for this question.)
+
+
+### Scatterplot Matrix (8 points)
+
+Create a **scatterplot matrix** of your response and the three quantitative predictors. Note: we are not asking for individual scatterplots.
+
+```{r scatterplotMatrix}
+# Replace this text with your code
+plot( ~ cmRate + medianAge + pctUnemployed + pctPublicHC, data = rates)
+```
+
+Reflect on your scatterplot matrix by answering the questions below. 
+
+- Do there appear to be any *linear* relationships between your response variable and any of the predictors? Which predictor(s) seem to have the strongest relationship?
+
+**Answer:** There appears to be a linear relationship between the unemployment percent and cancer mortality rate as well as the percent of people on public healthcare and cancer mortality rate. Both of these predictors appear to have similarly strong relationships. However, there does not appear to be much of a relationship between the median age and the response.
+
+
+- Would any of the predictors *potentially* benefit from using a quadratic fit? 
+
+**Answer:** Given the plots above, none of the relationships appear to be quadratic, thus none of the predictors would likely benefit from a quadratic fit.
+
+
+- Are there any strong relationships between the predictor variables themselves (not with the response)? This will come in handy later on when we discuss multicollinearity.
+
+**Answer:** There appears to be the percent of the residents that are on public health care seems to have moderatly strong relationships with unemployment percent and median age.
+
+
+
+### Boxplot (6 points)
+
+Create a side-by-side boxplot of your response variable versus your categorical predictor. *Be sure to give your plot appropriate axis labels and a title.* 
+
+```{r sideBySideBoxplot}
+# Replace this text with your code
+plot(cmRate ~ region, data = rates, 
+     xlab = "Region", ylab = "Cancer Mortality Rate", 
+     main = "Cancer Mortality Rates by Region", 
+     col = c("darkkhaki", "dodgerblue", "darkorange3", "firebrick4", "lightblue1"))
+        
+```
+
+Reflect on your side-by-side boxplot by answering the question below. 
+
+- Does the response differ by group? How so? If yes, you may want to create a scatterplot *by groups* (using color) in the future!
+
+**Answer:** As shown in the boxplot above, for some reason, the southeastern region appears to have a higher cancer rate on average than the other groups. Additionally, the western region appears to have a slightly lower cancer rate on average than the other groups.
+
+
+
+### Initial Model (2 points)
+
+Create and store a linear model using all four of the predictor variables. Do not include any transformations, quadratic fits, or interactions (regardless of your answers above). Pass your stored model through the `summary()` function.
+
+```{r intitialModel}
+# Replace this text with your code
+model <- lm(cmRate ~ medianAge + pctUnemployed + pctPublicHC + region, data = rates)
+summary(model)
+```
+
+Your goal is to improve this model. Explore additional predictor variables from your data set. Explore log transformations, quadratic fits, and interactions, when appropriate. 
+
+
+
+### Conclusions (4 points)
+
+Reflect on your analysis above (in 2 - 5 sentences). Highlight any key findings from your initial data exploration. Where do you plan to go from here? 
+
+If you have any questions for the instructional team (about coding, the direction of your analysis, possible transformations, etc.), you can include them here! 
+
+**Answer:** From this initial data exploration, I have noticed that it is possible that multicollinearity may exist between the percent on public health care and percent unemployed and the percent on public health care and the median age. More investigation will be needed to determine if it does exist, and if so, what steps need to be taken. I plan to add additional predictors to the model. If I am not satisfied with the data, it is possible that I may alter my objective and attempt to predict the unemployment rate, median income, average home size, or another variable from the model. Currently, the data did not demonstrate a need for any transformations, but as I add variables and/or change my direction, transforamtions may become necessary.
+
+
+

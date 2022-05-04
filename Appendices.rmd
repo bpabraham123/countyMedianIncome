@@ -1,0 +1,403 @@
+---
+title: "Appendices"
+author: "Ben Abraham   "
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r packages, include = FALSE}
+# Load any packages you may need here
+library(car)
+library(emmeans)
+```
+
+
+```{r readData, include = FALSE}
+income <- read.csv("cancer_mortality_rates.csv", stringsAsFactors = TRUE)
+income$medianIncome <- income$medianIncome / 1000
+```
+
+
+***
+
+#### Figure 1: Scatterplot Matrix of Data
+
+```{r figure1, echo=FALSE}
+plot(~ medianIncome + pctBach + pctUnemployed + avgHouse, data = income)
+```
+
+***
+
+#### Figure 2: Histogram of Median Income
+
+```{r figure2, echo=FALSE}
+hist(income$medianIncome,
+     main = "Histogram of Median Income",
+     xlab = "Body Mass (in grams)",
+     col = "deepskyblue")
+```
+
+***
+
+#### Figure 3: Histogram of the Proportion of Residents with a Bachelor's Degree
+
+```{r figure3, echo=FALSE}
+hist(income$pctBach,
+     main = "Histogram of the Proportion of Residents with a Bachelor's Degree",
+     xlab = "Proportion of Residents with a Bachelor's Degree",
+     col = "darkslategray3")
+```
+
+***
+
+#### Figure 4: Histogram of Unemployment Rate
+
+```{r figure4, echo=FALSE}
+hist(income$pctUnemployed,
+     main = "Histogram of Unemployment Rate",
+     xlab = "Unemployment Rate",
+     col = "darkseagreen2")
+```
+
+***
+
+#### Figure 5: Histogram of Average Household Size
+
+```{r figure5, echo=FALSE}
+hist(income$avgHouse,
+     main = "Histogram of Average Household Size",
+     xlab = "Average Household Size",
+     col = "indianred2")
+```
+
+***
+
+#### Figure 6: Boxplot of Region
+
+```{r figure6, echo = FALSE}
+plot(medianIncome ~ region, data = income, 
+     xlab = "Region", ylab = "Median Income (In thousands of dollars)", 
+     main = "Median Income by Region", 
+     col = c("darkkhaki", "dodgerblue", "darkorange3", "firebrick4", "lightblue1"))
+```
+
+***
+
+#### Figure 7: Initial Model Summary
+
+```{r figure 7, echo = FALSE}
+model_version0 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + region, data = income)
+summary(model_version0)
+```
+
+***
+
+#### Figure 8: Distribution of Population Variable Before Log Transformation
+
+
+```{r figure8, echo = FALSE}
+hist(income$population,
+     main = "Histogram of Population without Logarithmic Transformation",
+     xlab = "Population",
+     col = "lightblue")
+```
+
+***
+
+#### Figure 9: Distribution of Population Variable After Logarithmic Transformation
+
+
+```{r figure9, echo = FALSE}
+hist(log(income$population),
+     main = "Histogram of Population with Logarithmic Transformation",
+     xlab = "log(population)",
+     col = "lightblue")
+```
+
+***
+
+#### Figure 10: Scatterplot of Poverty Rate and Median Income
+
+
+```{r figure10, echo = FALSE}
+plot(medianIncome ~ pctPoverty,
+     data = income,
+     xlab = "Poverty Rate",
+     ylab = "Median Income",
+     main = "Median Income vs Poverty Rate")
+```
+
+***
+
+#### Figure 11: Scatterplot of Median Income and log(population) by Region
+
+
+```{r figure11, echo = FALSE}
+plot(medianIncome ~ log(population),
+     data = income,
+     col = c("blue", "orange", "gray40", "red", "lightblue")[region],
+     pch = c(1, 2, 3, 4, 5)[region],
+     xlab = "log(population)",
+     ylab = "Median Income",
+     main = "Median Income vs log(population) by Region")
+
+legend(x = 14.5, y = 99,
+       legend = levels(income$region),
+       col = c("blue", "orange", "gray40", "red", "lightblue"),
+       pch = c(1, 2, 3, 4, 5))
+
+```
+
+***
+
+#### Figure 12: Summary Output with Interaction Term on Average House Size
+
+
+```{r figure12, echo = FALSE}
+model_interaction <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + log(population) * region, data = income)
+summary(model_interaction)
+```
+
+***
+
+#### Figure 13: Scatterplot Matrix of Strong Linear Relationships (pctHS, pctEmployed, pctMarried, and pctMarriedHouse)
+
+```{r figure13, echo=FALSE}
+plot(~ medianIncome + pctHS + pctEmployed + pctMarried + pctMarriedHouse, data = income)
+```
+
+
+***
+
+#### Figure 14: Scatterplot Matrix of Strong Linear Relationships (pctPrivateHC, pctPublicHC, and pctEmployerHC)
+
+```{r figure14, echo=FALSE}
+plot(~ medianIncome + pctPrivateHC + pctPublicHC + pctEmployerHC, data = income)
+```
+
+***
+
+#### Figure 15: Scatterplot of Median Income vs Population with a logarithmic transformation
+
+```{r figure15, echo=FALSE}
+plot(medianIncome ~ log(population), data = income,
+     main = "Median Income vs log(population)",
+     xlab = "log(population)",
+     ylab = "Median Income")
+```
+
+***
+
+#### Figure 16: Model Output for Initial Model with pctHS as additional predictor
+
+```{r figure16, echo=FALSE}
+model_version2 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctHS + region, data = income)
+summary(model_version2)
+```
+
+
+***
+
+#### Figure 17: Model Output for Initial Model with pctPublicHC as additional predictor
+
+```{r figure17, echo=FALSE}
+model_version3 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctPublicHC + region, data = income)
+summary(model_version3)
+```
+
+***
+
+#### Figure 18: Model Output for Initial Model with pctPrivateHC as additional predictor
+
+```{r figure18, echo=FALSE}
+model_version4 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctPrivateHC + region, data = income)
+summary(model_version4)
+```
+
+***
+
+#### Figure 19: Model Output for Initial Model with pctEmployerHC as additional predictor
+
+```{r figure19, echo=FALSE}
+model_version5 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctEmployerHC + region, data = income)
+summary(model_version5)
+```
+
+***
+
+#### Figure 20: Model Output for Initial Model with pctMarried as additional predictor
+
+```{r figure20, echo=FALSE}
+model_version6 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctMarried + region, data = income)
+summary(model_version6)
+```
+
+
+***
+
+#### Figure 21: Model Output for Initial Model with pctPoverty as additional predictor
+
+```{r figure21, echo=FALSE}
+model_version7 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctPoverty + I(pctPoverty^2)+ region, data = income)
+summary(model_version7)
+```
+
+
+
+***
+
+#### Figure 22: Model Output for Initial Model with pctMarriedHouse as additional predictor
+
+```{r figure22, echo=FALSE}
+model_version8 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + pctMarriedHouse + region, data = income)
+summary(model_version8)
+```
+
+***
+
+#### Figure 23: Model Output for Initial Model with log(population) as additional predictor
+
+```{r figure23, echo=FALSE}
+model_version9 <- lm(medianIncome ~ pctBach + pctUnemployed + avgHouse + log(population) + region, data = income)
+summary(model_version9)
+```
+
+
+
+***
+
+#### Figure 24: Model Output of Model with Added Variables
+
+```{r figure24, echo=FALSE}
+model_final_v1 <- lm(medianIncome ~ pctBach + pctUnemployed + pctPublicHC + pctPrivateHC + pctEmployerHC + pctMarried + pctMarriedHouse + avgHouse + pctPoverty + I(pctPoverty^2) + log(population) + region, data = income)
+summary(model_final_v1)
+```
+
+
+
+***
+
+#### Figure 25: Comparing models with a quadratic term and one without
+
+```{r figure25, echo=FALSE}
+model_without_quadratic <- lm(medianIncome ~ pctPoverty, data = income)
+model_with_quadratic <- lm(medianIncome ~ pctPoverty + I(pctPoverty^2), data = income)
+model_with_third_power <- lm(medianIncome ~ pctPoverty + I(pctPoverty^2) +I(pctPoverty^3), data = income)
+
+
+quadData <- data.frame(pctPoverty = seq(min(income$pctPoverty), max(income$pctPoverty), by = 0.01))
+
+quadData$Fitted <- predict(model_without_quadratic, newdata = quadData)
+quadData$Fitted1 <- predict(model_with_quadratic, newdata = quadData)
+quadData$Fitted2 <- predict(model_with_third_power, newdata = quadData)
+
+
+plot(income$medianIncome ~ income$pctPoverty,
+     main = "Median Income vs Poverty by Exponents",
+     ylab = "Median Income",
+     xlab = "Poverty Rate")
+
+
+lines(quadData$pctPoverty, quadData$Fitted, col = "red")
+lines(quadData$pctPoverty, quadData$Fitted1, col = "blue")
+lines(quadData$pctPoverty, quadData$Fitted2, col = "green")
+
+legend(30, 99, legend=c("First Power", "Second Power", "Third Power"),
+       col=c("red", "blue", "green"), lty=1, cex=1)
+
+```
+
+***
+
+#### Figure 26: Plot of Residuals for Model of the Second Power
+
+```{r figure26, echo=FALSE}
+plot(model_final_v1$fitted.values, model_final_v1$residuals,
+     main = "Residuals versus Fitted Values Plot",
+     xlab = "Fitted Values",
+     ylab = "Residuals")
+abline(h = 0, col = "red", lty = 2)
+```
+
+
+***
+
+#### Figure 27: Model with third power exponent
+
+```{r figure27, echo=FALSE}
+model_final_v2 <- lm(medianIncome ~ pctBach + pctUnemployed + pctPublicHC + pctPrivateHC + pctEmployerHC + pctMarried + pctMarriedHouse + avgHouse + pctPoverty + I(pctPoverty^2) + I(pctPoverty^3) + log(population) + region, data = income)
+summary(model_final_v2)
+```
+
+
+
+
+***
+
+#### Figure 28: Residual Plot for Final Model
+
+```{r figure28, echo=FALSE}
+plot(model_final_v2$fitted.values, model_final_v2$residuals,
+     main = "Residuals versus Fitted Values Plot",
+     xlab = "Fitted Values",
+     ylab = "Residuals")
+abline(h = 0, col = "red", lty = 2)
+```
+
+
+***
+
+#### Figure 29: QQ Plot for Final Model
+
+```{r figure29, echo=FALSE}
+qqnorm(model_final_v2$residuals, main = "QQ Plot of the Residuals")
+qqline(model_final_v2$residuals)
+```
+
+
+
+***
+
+#### Figure 30: VIF Output for Final Model
+
+```{r figure30, echo=FALSE}
+vif(model_final_v2)
+```
+
+***
+
+#### Figure 31: Expected Change in Response for a one Standard Deviation Increase in each variable
+
+```{r figure31, echo=FALSE}
+sd(income$pctBach) * model_final_v2$coefficients[2]
+sd(income$pctUnemployed) * model_final_v2$coefficients[3]
+sd(income$pctPublicHC) *model_final_v2$coefficients[4]
+sd(income$pctPrivateHC) * model_final_v2$coefficients[5]
+sd(income$pctEmployerHC) * model_final_v2$coefficients[6]
+sd(income$pctMarried) * model_final_v2$coefficients[7]
+sd(income$pctMarriedHouse) * model_final_v2$coefficients[8]
+sd(income$avgHouse) * model_final_v2$coefficients[9]
+sd(log(income$population)) * model_final_v2$coefficients[13]
+```
+
+***
+
+#### Figure 32: Model Output without pctMarried
+
+```{r figure32, echo=FALSE}
+model_final_v3 <- lm(medianIncome ~ pctBach + pctUnemployed + pctPublicHC + pctPrivateHC + pctEmployerHC + pctMarriedHouse + avgHouse + pctPoverty + I(pctPoverty^2) + + I(pctPoverty^3) + log(population) + region, data = income)
+summary(model_final_v3)
+```
+
+
+
+
+
+
+
+
+
